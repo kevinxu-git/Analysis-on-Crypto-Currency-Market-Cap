@@ -47,9 +47,9 @@ data.summary <- data.frame(mean = sapply(data.pre, mean),
 #maybe we need some understanding about each variables.
 #find relation of two variables in our datafile
 round(cor(data.pre),2)
-                                                   
+data.pre <- data[,-4]                                            
 ## PCA
-pcs <- prcomp(data[, -2], scale. = TRUE) 
+pcs <- prcomp(data,pre, scale. = TRUE) 
 summary(pcs)
 pcs$rot[,1:5]                                                   
 plot(pcs)
