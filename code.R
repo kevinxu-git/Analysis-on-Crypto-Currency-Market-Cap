@@ -135,7 +135,6 @@ norm.values <- preProcess(train.df[, 1:5], method = c("center", "scale"))
 train.norm.df[, 1:5] <- predict(norm.values, train.df[, 1:5])
 valid.norm.df[, 1:5] <- predict(norm.values, valid.df[, 1:5])
 test.norm.df[, 1:5] <- predict(norm.values, test.df[, 1:5])
-new.norm.df <- predict(norm.values, new.df)
 
 ### Fit model
 library(class)
