@@ -124,17 +124,19 @@ summary(lm.full.step)
 ### Best model = with 0 predictors ...
 
 
+
 ## KNN
 ### Data Normalization
+predictors <- c(1:4, 6) 
 train.norm.df <- train.df
 valid.norm.df <- valid.df
 test.norm.df <- test.df
 
 library(caret)
-norm.values <- preProcess(train.df[, 1:5], method = c("center", "scale"))
-train.norm.df[, 1:5] <- predict(norm.values, train.df[, 1:5])
-valid.norm.df[, 1:5] <- predict(norm.values, valid.df[, 1:5])
-test.norm.df[, 1:5] <- predict(norm.values, test.df[, 1:5])
+norm.values <- preProcess(train.df[, predictors], method = c("center", "scale"))
+train.norm.df[, predictors] <- predict(norm.values, train.df[, predictors])
+valid.norm.df[, predictors] <- predict(norm.values, valid.df[, predictors])
+test.norm.df[, predictors] <- predict(norm.values, test.df[, predictors])
 
 ### Fit model
 library(class)
@@ -143,18 +145,19 @@ kMax <- 10
 accuracy.df <- data.frame(k = seq(1, kMax, 1), accuracy = rep(0, kMax))
 
 for(i in 1:kMax) {
-  knn.pred <- class::knn(train.norm.df[, 1:5], valid.norm.df[, 1:5], cl = train.norm.df[, 6], k = i)
-  accuracy.df[i, 2] <- accuracy(as.numeric(knn.pred), valid.norm.df[, 6])[2]
+  knn.pred <- class::knn(train.norm.df[, predictors], valid.norm.df[, predictors], cl = train.norm.df[, 5], k = i)
+  accuracy.df[i, 2] <- accuracy(as.numeric(knn.pred), valid.norm.df$Market.Cap...)[2]
 }
-accuracy.df
+# accuracy.df
 k <- which.min(accuracy.df[,2])
 k
+accuracy.df[k,2]
 
 ### Evaluating Predictive Performance of KNN
-knn.pred <- class::knn(train.norm.df[, 1:5], valid.norm.df[, 1:5], cl = train.norm.df[, 6], k = 3)
+knn.pred <- class::knn(train.norm.df[, predictors], valid.norm.df[, predictors], cl = train.norm.df[, 5], k = 3)
 knn.pred <- as.numeric(as.character(knn.pred))
 
-accuracy(knn.pred, valid.df$Market.Cap...)
+accuracy(knn.pred, valid.norm.df$Market.Cap...)
 
 #### Lift chart
 gain <- gains(valid.df$Market.Cap..., knn.pred)
