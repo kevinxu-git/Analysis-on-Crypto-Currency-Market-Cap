@@ -127,18 +127,20 @@ lm.full.step <- step(lm.full, direction = "both",intercept = FALSE)
 summary(lm.full.step)
 ### Best model = with 0 predictors ...
 
+
+
 ## KNN
 ### Data Normalization
+predictors <- c(1:4, 6) 
 train.norm.df <- train.df
 valid.norm.df <- valid.df
 test.norm.df <- test.df
 
 library(caret)
-norm.values <- preProcess(train.df[, 1:5], method = c("center", "scale"))
-train.norm.df[, 1:5] <- predict(norm.values, train.df[, 1:5])
-valid.norm.df[, 1:5] <- predict(norm.values, valid.df[, 1:5])
-test.norm.df[, 1:5] <- predict(norm.values, test.df[, 1:5])
-
+norm.values <- preProcess(train.df[, predictors], method = c("center", "scale"))
+train.norm.df[, predictors] <- predict(norm.values, train.df[, predictors])
+valid.norm.df[, predictors] <- predict(norm.values, valid.df[, predictors])
+test.norm.df[, predictors] <- predict(norm.values, test.df[, predictors])
 
 ### Fit model
 library(class)
@@ -147,32 +149,40 @@ kMax <- 10
 accuracy.df <- data.frame(k = seq(1, kMax, 1), accuracy = rep(0, kMax))
 
 for(i in 1:kMax) {
-  knn.pred <- class::knn(train.norm.df[, 1:5], valid.norm.df[, 1:5], cl = train.norm.df[, 6], k = i)
-  accuracy.df[i, 2] <- accuracy(as.numeric(knn.pred), valid.norm.df[, 6])[2]
+  knn.pred <- class::knn(train.norm.df[, predictors], valid.norm.df[, predictors], cl = train.norm.df[, 5], k = i)
+  accuracy.df[i, 2] <- accuracy(as.numeric(knn.pred), valid.norm.df$Market.Cap...)[2]
 }
-
-accuracy.df
+# accuracy.df
 k <- which.min(accuracy.df[,2])
-
+k
+accuracy.df[k,2]
 
 ### Evaluating Predictive Performance of KNN
-knn.pred <- class::knn(train.norm.df[, 1:5], valid.norm.df[, 1:5], cl = train.norm.df[, 6], k = 3)
+knn.pred <- class::knn(train.norm.df[, predictors], valid.norm.df[, predictors], cl = train.norm.df[, 5], k = 3)
 knn.pred <- as.numeric(as.character(knn.pred))
-accuracy(knn.pred, valid.df$Market.Cap...)
+
+accuracy(knn.pred, valid.norm.df$Market.Cap...)
+
+#### Graph real vs predicted
+par(mfrow=c(1,1))
+plot(valid.df$Market.Cap..., knn.pred, xlab = "Real values", ylab = "Predicted value", col='red', main='Real vs predicted values - Validation Set - KNN', pch=18, cex=0.7)
+abline(0, 1, lwd=2)
 
 #### Lift chart
 gain <- gains(valid.df$Market.Cap..., knn.pred)
 options(scipen=999) 
 plot(c(0, gain$cume.pct.of.total*sum(valid.df$Market.Cap...)) ~ c(0, gain$cume.obs), 
-     xlab="# cases", ylab="Cumulative Market.Cap...", main="LiftChart", 
+     xlab="# cases", ylab="Cumulative Market.Cap...", main="LiftChart - Validation Set - KNN", 
      type="l")
 lines(c(0, sum(valid.df$Market.Cap...)) ~ c(0, dim(valid.df)[1]), col = "gray", lty = 2)
-
+legend(250, 3000000000000, legend = c("Cumulative using predicted values", 
+                           "Cumulative using average"), col = c(1, "gray"), lty = c(1, 2))
 
 #### Decile-wise lift chart
 barplot(gain$mean.resp/mean(valid.df$Market.Cap...), names.arg = gain$depth,
         xlab = "Percentile", ylab = "Mean Response", 
-        main = "Decile-wise lift chart")
+        main = "Decile-wise lift chart - Validation Set - KNN")
+
 
 
 ### neuralnet 
