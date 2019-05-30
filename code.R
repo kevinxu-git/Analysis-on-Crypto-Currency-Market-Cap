@@ -406,10 +406,8 @@ test_ <- scaled[test.index,]
 
 
 #after preprocessing max-min method and scale the data in the interval [0,1], use neuralnet(): target - marketcap 
-kmax<- 5
-mse.df <- data.frame(k = seq(1, kMax, 1), mse = rep(0, kMax))
 
-# to decide a number of hidden, we can try 1 to 5
+
 for ( i in 1:kmax){
 train.nn <- neuralnet(Market.Cap... ~ ., data = train_, hidden =i ,linear.output = F)
 
@@ -475,7 +473,7 @@ val.pr.nn_ <- val.pr.nn$net.result*(max(data.pre$Market.Cap...)-min(data.pre$Mar
 
 test.r <- (test_$Market.Cap...)*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
 
-val.MSE.nn <- sum((test.r- pr.nn_)^2)/nrow(test_)
+val.MSE.nn <- sum((test.r- val.pr.nn_)^2)/nrow(test_)
 
 
 
@@ -502,3 +500,33 @@ points(test.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
 abline(0,1,lwd=2)
 
 legend('bottomright',legend=c('NN','LM'),pch=18,col=c('red','blue'))
+
+#### Lift chart
+val.pred <- compute(valid.nn,valid_[,-5])
+val.pred_ <- val.pred$net.result*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
+library(gains)
+
+gain <- gains(valid.df$Market.Cap..., val.pred_)
+
+options(scipen=999) 
+
+plot(c(0, gain$cume.pct.of.total*sum(valid.df$Market.Cap...)) ~ c(0, gain$cume.obs), 
+     
+     xlab="# cases", ylab="Cumulative Market.Cap...", main="LiftChart", 
+     
+     type="l")
+
+lines(c(0, sum(valid.df$Market.Cap...)) ~ c(0, dim(valid.df)[1]), col = "gray", lty = 2)
+
+
+
+
+
+#### Decile-wise lift chart
+
+barplot(gain$mean.resp/mean(valid.df$Market.Cap...), names.arg = gain$depth,
+        
+        xlab = "Percentile", ylab = "Mean Response", 
+        
+        main = "Decile-wise lift chart")
+
