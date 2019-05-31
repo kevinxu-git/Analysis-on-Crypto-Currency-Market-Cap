@@ -457,7 +457,7 @@ legend('bottomright',legend='LM',pch=18,col='blue', bty='n', cex=.95)
 
 
 
-plot(valid.df$Market.Cap...,pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
+plot(valid.df$Market.Cap...,pr.nn_,col='red',main='predicted LM vs predicted NN',pch=18,cex=0.7)
 
 points(valid.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
 
