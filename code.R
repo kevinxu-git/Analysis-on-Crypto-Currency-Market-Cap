@@ -423,29 +423,33 @@ MSE.nn <- sum((test.r- pr.nn_)^2)/nrow(test_)
 mse.df[i,2] <- MSE.nn;
 }
 mse.df
+                                             
 #3 is best for hidden
-#re assign hedden = 3
+#re assign hedden = 3                                             
 train.nn <- neuralnet(Market.Cap... ~ ., data = train_, hidden =3 ,linear.output = F)
 
 plot(train.nn, rep = "best")
 
-pr.nn <- compute(train.nn,test_[,-5])
+pr.nn <- compute(train.nn,valid_[,-5])
 
 pr.nn_ <- pr.nn$net.result*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
 
-test.r <- (test_$Market.Cap...)*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
+valid.r <- (valid_$Market.Cap...)*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
 
-MSE.nn <- sum((test.r- pr.nn_)^2)/nrow(test_)
+MSE.nn <- sum((valid.r- pr.nn_)^2)/nrow(valid_)
+
+pr.lm <- predict(lm.full,train.df)
+MSE.lm <- sum((valid.df$Market.Cap...- pr.lm)^2)/nrow(valid.df)
 
 par(mfrow=c(1,2))
 
-plot(test.df$Market.Cap...,pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
+plot(valid.df$Market.Cap...,pr.nn_,col='red',main='valid vs predicted NN',pch=18,cex=0.7)
 
 abline(0,1,lwd=2)
 
 legend('bottomright',legend='NN',pch=18,col='red', bty='n')
 
-plot(test.df$Market.Cap...,pr.lm,col='blue',main='Real vs predicted lm',pch=18, cex=0.7)
+plot(valid.df$Market.Cap...,pr.lm,col='blue',main='valid vs predicted lm',pch=18, cex=0.7)
 
 abline(0,1,lwd=2)
 
@@ -453,54 +457,13 @@ legend('bottomright',legend='LM',pch=18,col='blue', bty='n', cex=.95)
 
 
 
-plot(test.df$Market.Cap...,pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
+plot(valid.df$Market.Cap...,pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
 
-points(test.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
-
-abline(0,1,lwd=2)
-
-legend('bottomright',legend=c('NN','LM'),pch=18,col=c('red','blue'))
-
-#then let compare with valid data and test data and also compare with lm 
-
-valid.nn <- neuralnet(Market.Cap... ~ ., data = valid_, hidden = 3,linear.output = F)
-
-plot(valid.nn, rep = "best")
-
-val.pr.nn <- compute(valid.nn,test_[,-5])
-
-val.pr.nn_ <- val.pr.nn$net.result*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
-
-test.r <- (test_$Market.Cap...)*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
-
-val.MSE.nn <- sum((test.r- val.pr.nn_)^2)/nrow(test_)
-
-
-
-par(mfrow=c(1,2))
-
-plot(test.df$Market.Cap...,val.pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
-
-abline(0,1,lwd=2)
-
-legend('bottomright',legend='NN',pch=18,col='red', bty='n')
-
-plot(test.df$Market.Cap...,pr.lm,col='blue',main='Real vs predicted lm',pch=18, cex=0.7)
-
-abline(0,1,lwd=2)
-
-legend('bottomright',legend='LM',pch=18,col='blue', bty='n', cex=.95)
-
-
-
-plot(test.df$Market.Cap...,val.pr.nn_,col='red',main='Real vs predicted NN',pch=18,cex=0.7)
-
-points(test.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
+points(valid.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
 
 abline(0,1,lwd=2)
 
 legend('bottomright',legend=c('NN','LM'),pch=18,col=c('red','blue'))
-
 #### Lift chart
 val.pred <- compute(valid.nn,valid_[,-5])
 val.pred_ <- val.pred$net.result*(max(data.pre$Market.Cap...)-min(data.pre$Market.Cap...))+min(data.pre$Market.Cap...)
