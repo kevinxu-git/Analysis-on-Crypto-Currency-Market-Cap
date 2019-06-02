@@ -275,13 +275,13 @@ library(class)
 library(forecast)
 kMax <- 10
 accuracy.df <- data.frame(k = seq(1, kMax, 1), accuracy = rep(0, kMax))
-
+set.seed(123)  # set seed for reproducing the partition
 
 for(i in 1:kMax) {
   knn.pred <- class::knn(train.norm.df[, predictors], valid.norm.df[, predictors], cl = train.norm.df[, 5], k = i)
   accuracy.df[i, 2] <- accuracy(as.numeric(knn.pred), valid.norm.df$Market.Cap...)[2]
 }
-# accuracy.df
+accuracy.df
 k <- which.min(accuracy.df[,2])
 k
 accuracy.df[k,2]
@@ -294,17 +294,20 @@ accuracy(knn.pred, valid.norm.df$Market.Cap...)
 
 #### Graph real vs predicted
 par(mfrow=c(1,1))
+options(scipen=1) 
 plot(valid.df$Market.Cap..., knn.pred, xlab = "Real values", ylab = "Predicted value", col='red', main='Real vs predicted values - Validation Set - KNN', pch=18, cex=0.7)
 abline(0, 1, lwd=2)
+legend('bottomright',legend=c('Predicted value'),pch=18,col=c('red'))
+
 
 #### Lift chart
 gain <- gains(valid.df$Market.Cap..., knn.pred)
-options(scipen=999) 
+options(scipen=1) 
 plot(c(0, gain$cume.pct.of.total*sum(valid.df$Market.Cap...)) ~ c(0, gain$cume.obs), 
      xlab="# cases", ylab="Cumulative Market.Cap...", main="LiftChart - Validation Set - KNN", 
      type="l")
 lines(c(0, sum(valid.df$Market.Cap...)) ~ c(0, dim(valid.df)[1]), col = "gray", lty = 2)
-legend(250, 3000000000000, legend = c("Cumulative using predicted values", 
+legend('bottomright', legend = c("Cumulative using predicted values", 
                                       "Cumulative using average"), col = c(1, "gray"), lty = c(1, 2))
 
 #### Decile-wise lift chart
@@ -325,7 +328,7 @@ abline(0, 1, lwd=2)
 
 #### Lift chart
 gain <- gains(test.df$Market.Cap..., knn.pred)
-options(scipen=999) 
+options(scipen=1) 
 plot(c(0, gain$cume.pct.of.total*sum(test.df$Market.Cap...)) ~ c(0, gain$cume.obs), 
      xlab="# cases", ylab="Cumulative Market.Cap...", main="LiftChart - Test Set - KNN", 
      type="l")
@@ -379,8 +382,9 @@ test_ <- scaled[test.index,]
 
 
 #after preprocessing max-min method and scale the data in the interval [0,1], use neuralnet(): target - marketcap 
-
-
+mse.df <- matrix(0, kmax, 2)
+  
+kmax <- 10
 for ( i in 1:kmax){
 train.nn <- neuralnet(Market.Cap... ~ ., data = train_, hidden =i ,linear.output = F)
 
@@ -430,7 +434,8 @@ legend('bottomright',legend='LM',pch=18,col='blue', bty='n', cex=.95)
 
 
 
-plot(valid.df$Market.Cap...,pr.nn_,col='red',main='predicted LM vs predicted NN',pch=18,cex=0.7)
+par(mfrow = c(1,1))
+plot(valid.df$Market.Cap...,pr.nn_,col='red',main='d',pch=18,cex=0.7, xlab = "Real Market Cap", ylab = "Predicted Market Cap")
 
 points(valid.df$Market.Cap...,pr.lm,col='blue',pch=18,cex=0.7)
 
