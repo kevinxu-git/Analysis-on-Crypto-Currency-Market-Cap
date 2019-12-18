@@ -3,6 +3,6 @@ Project realized during the course Data Mining at Yonsei University, Spring Seme
 
 # Authors
 
-+ **Kevin XU** - *Exchange student at Yonsei* - [wenkai88](https://github.com/wenkai88)
++ **Kevin XU** - *Exchange student at Yonsei* - [kevinxu-git](https://github.com/kevinxu-git)
 + **Oh Han Seung** - *Undergraduate Student at Yonsei* - [nothingct](https://github.com/nothingct)
 + **Cho Hyeon Jae** - *Undergraduate Student at Yonsei* - [myevertime](https://github.com/myevertime)
