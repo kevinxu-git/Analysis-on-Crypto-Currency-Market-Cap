@@ -1,7 +1,5 @@
-# Data Mining Project
+# Data Mining Project - Analysis on Crypto Currency Market Cap
 Project realized during the course Data Mining at Yonsei University, Spring Semester 2019
-
-Analysis on Crypto Currency Market Cap
 
 # Authors
 
