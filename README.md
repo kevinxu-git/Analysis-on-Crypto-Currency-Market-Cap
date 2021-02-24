@@ -1,5 +1,5 @@
 # Data Mining Project - Analysis on Crypto Currency Market Cap
-> Yonsei University - Spring Semester March - June 2019
+> Spring Semester March-June 2019, Yonsei University, Seoul, South Korea
 > 
 Project realized during the Data Mining course
 
